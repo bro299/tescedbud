@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CerdasBudi - Psikolog AI Anda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6D28D9',
+                        secondary: '#4C1D95',
+                        accent: '#8B5CF6',
+                        background: '#1F2937',
+                        card: '#374151',
+                        text: '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        .chat-bubble::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 10px 10px 10px 0;
+            border-style: solid;
+            border-color: transparent #374151 transparent transparent;
+        }
+        .loader {
+            border-top-color: #6D28D9;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .blob {
+            animation: blob 7s infinite;
+        }
+        @keyframes blob {
+            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+        .navbar {
+            transition: background-color 0.3s ease;
+        }
+        .navbar.scrolled {
+            background-color: rgba(55, 65, 81, 0.9);
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .faq-item {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+    </style>
+    <style>
+        /* Hero Section */
+        #home {
+            background: linear-gradient(135deg, #6D28D9 0%, #4C1D95 50%, #8B5CF6 100%);
+        }
+
+        /* Background Section */
+        #background {
+            background: radial-gradient(circle at top right, #8B5CF6 0%, #6D28D9 50%, #4C1D95 100%);
+        }
+
+        /* Features Section */
+        #features {
+            background: linear-gradient(45deg, #374151 0%, #1F2937 100%);
+        }
+
+        /* How to Use Section */
+        #how-to-use {
+            background: linear-gradient(to right, #1F2937, #374151, #1F2937);
+        }
+
+        /* Chat Section */
+        #chat-section {
+            background: radial-gradient(ellipse at bottom, #4C1D95 0%, #1F2937 100%);
+        }
+
+        /* FAQ Section */
+        #faq {
+            background: linear-gradient(180deg, #1F2937 0%, #374151 100%);
+        }
+
+        /* Error Help Section */
+        #error-help {
+            background: linear-gradient(135deg, #374151 0%, #4C1D95 100%);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(to right, #1F2937, #2D3748);
+        }
+
+        /* Add a subtle animation to gradients */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Apply animation to all sections */
+        section {
+            background-size: 200% 200%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-text font-sans dark">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar fixed w-full z-10 top-0 left-0 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 text-white text-xl font-bold flex items-center">
+                        <i class="fas fa-brain mr-2"></i>
+                        CerdasBudi
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#home" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                            <a href="#features" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Fitur</a>
+                            <a href="#how-to-use" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Cara Penggunaan</a>
+                            <a href="#faq" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none focus:text-white">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-card">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                <a href="#features" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Fitur</a>
+                <a href="#how-to-use" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Cara Penggunaan</a>
+                <a href="#faq" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">FAQ</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-24 pb-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
+        <div class="container mx-auto px-4 relative">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight opacity-0" id="main-title">Selamat Datang di <span class="text-accent">CerdasBudi</span></h1>
+                    <p class="text-lg md:text-xl mb-8 opacity-0" id="main-subtitle">Teman AI Anda untuk mengatasi perundungan, rasa malu, dan meningkatkan kepercayaan diri</p>
+                    <a href="#chat-section" class="bg-accent text-text font-bold py-3 px-6 rounded-full hover:bg-opacity-80 transition duration-300 opacity-0" id="start-chat-btn">
+                        <i class="fas fa-comments mr-2"></i>Mulai Mengobrol Sekarang
+                    </a>
+                </div>
+                <div class="md:w-1/2 relative">
+                    <div class="blob bg-accent w-64 h-64 absolute top-0 right-0 opacity-50"></div>
+                    <img src="assets/ai1.png" alt="AI Assistant" class="relative z-10 rounded-lg shadow-2xl opacity-0" id="hero-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Background Section -->
+    <section id="background" class="py-16 bg-gradient-to-br from-primary via-secondary to-accent">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-6 text-white">Latar Belakang CerdasBudi</h2>
+                <p class="text-lg mb-8 text-gray-200">
+                    CerdasBudi lahir dari keprihatinan kami terhadap maraknya kasus perundungan dan dampaknya yang mendalam pada masyarakat kita, khususnya generasi muda. Kami melihat bagaimana korban perundungan sering kali mengalami:
+                </p>
+                <ul class="text-left text-gray-200 mb-8 space-y-4">
+                    <li><i class="fas fa-check-circle text-accent mr-2"></i>Rasa malu yang mendalam dan berkepanjangan</li>
+                    <li><i class="fas fa-check-circle text-accent mr-2"></i>Ketakutan untuk bersosialisasi atau mengekspresikan diri</li>
+                    <li><i class="fas fa-check-circle text-accent mr-2"></i>Kesulitan dalam membangun kepercayaan diri</li>
+                    <li><i class="fas fa-check-circle text-accent mr-2"></i>Masalah dalam lingkungan sekolah dan kerja</li>
+                    <li><i class="fas fa-check-circle text-accent mr-2"></i>Kecenderungan untuk menjadi antisosial</li>
+                </ul>
+                <p class="text-lg mb-8 text-gray-200">
+                    Kami percaya bahwa setiap individu berhak untuk merasa aman, dihargai, dan percaya diri. CerdasBudi hadir sebagai solusi inovatif untuk memberikan dukungan psikologis yang mudah diakses, tanpa judgement, dan tersedia 24/7.
+                </p>
+            </div>
+        </div>
+    
+        <!-- Vector Illustrations Section -->
+        <div class="mt-16 max-w-5xl mx-auto">
+            <h3 class="text-2xl font-bold mb-8 text-center text-white">Situasi dan Solusi</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Illustration 1: Bullying Situation -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="assets/bully.jpg" alt="Ilustrasi situasi perundungan" class="w-full h-40 object-cover mb-4 rounded">
+                    <h4 class="text-lg font-semibold mb-2 text-gray-800">Situasi Perundungan</h4>
+                    <p class="text-gray-600">Menggambarkan situasi perundungan yang sering terjadi di sekolah atau tempat kerja.</p>
+                </div>
+                
+                <!-- Illustration 2: Impact of Bullying -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="assets/dampak.jpg" alt="Ilustrasi dampak perundungan" class="w-full h-40 object-cover mb-4 rounded">
+                    <h4 class="text-lg font-semibold mb-2 text-gray-800">Dampak Perundungan</h4>
+                    <p class="text-gray-600">Menunjukkan dampak emosional dan psikologis dari perundungan pada korban.</p>
+                </div>
+                
+                <!-- Illustration 3: CerdasBudi Solution -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <img src="assets/berhasil.jpg" alt="Ilustrasi solusi CerdasBudi" class="w-full h-40 object-cover mb-4 rounded">
+                    <h4 class="text-lg font-semibold mb-2 text-gray-800">Solusi CerdasBudi</h4>
+                    <p class="text-gray-600">Menggambarkan bagaimana CerdasBudi membantu mengatasi dampak perundungan dan meningkatkan kepercayaan diri.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-card">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Fitur Unggulan CerdasBudi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center feature-card opacity-0 bg-background p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <i class="fas fa-shield-alt text-4xl text-accent mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Atasi Perundungan</h3>
+                    <p>Pelajari strategi untuk menghadapi dan mengatasi pengalaman perundungan di sekolah dan lingkungan sosial</p>
+                </div>
+                <div class="text-center feature-card opacity-0 bg-background p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <i class="fas fa-brain text-4xl text-accent mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Dukungan Kesehatan Mental</h3>
+                    <p>Dapatkan bimbingan dan dukungan untuk berbagai tantangan kesehatan mental dalam keluarga dan pekerjaan</p>
+                </div>
+                <div class="text-center feature-card opacity-0 bg-background p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                    <i class="fas fa-user-friends text-4xl text-accent mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Bangun Kepercayaan Diri</h3>
+                    <p>Kembangkan strategi untuk mengatasi rasa malu dan membangun kepercayaan diri di berbagai situasi sosial</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Use Section -->
+    <section id="how-to-use" class="py-16 bg-background">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Cara Menggunakan CerdasBudi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center p-6 rounded-lg bg-card shadow-lg fade-in">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-plus text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">1. Buat Profil</h3>
+                    <p>Isi informasi pribadi Anda untuk pengalaman yang lebih personal</p>
+                </div>
+                <div class="text-center p-6 rounded-lg bg-card shadow-lg fade-in">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comments text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">2. Mulai Percakapan</h3>
+                    <p>Mulai chat dengan CerdasBudi tentang masalah yang Anda hadapi</p>
+                </div>
+                <div class="text-center p-6 rounded-lg bg-card shadow-lg fade-in">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lightbulb text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">3. Dapatkan Saran</h3>
+                    <p>Terima saran dan strategi yang disesuaikan dengan situasi Anda</p>
+                </div>
+                <div class="text-center p-6 rounded-lg bg-card shadow-lg fade-in">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tasks text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">4. Terapkan Tips</h3>
+                    <p>Praktikkan saran yang diberikan dalam kehidupan sehari-hari</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Section -->
+    <section id="chat-section" class="py-16 bg-card">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Mengobrol dengan CerdasBudi</h2>
+            
+            <!-- Unique User Profile Form -->
+            <form id="user-profile-form" class="max-w-md mx-auto mb-8 bg-background p-8 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold mb-6 text-center">Buat Profil Anda</h3>
+                <div class="mb-6">
+                    <label for="user-name" class="block text-sm font-medium text-text mb-2">Nama</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </span>
+                        <input type="text" id="user-name" name="user-name" required class="w-full pl-10 pr-3 py-2 bg-card border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-text">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="user-age" class="block text-sm font-medium text-text mb-2">Usia</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <i class="fas fa-birthday-cake text-gray-400"></i>
+                        </span>
+                        <input type="number" id="user-age" name="user-age" required class="w-full pl-10 pr-3 py-2 bg-card border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-text">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-text mb-2">Jenis Kelamin</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="user-gender" value="laki-laki" required class="form-radio text-primary">
+                            <span class="ml-2">Laki-laki</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="user-gender" value="perempuan" required class="form-radio text-primary">
+                            <span class="ml-2">Perempuan</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="user-gender" value="lainnya" required class="form-radio text-primary">
+                            <span class="ml-2">Lainnya</span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-primary text-text font-bold py-3 px-4 rounded-md hover:bg-opacity-80 transition duration-300">
+                    <i class="fas fa-paper-plane mr-2"></i>Mulai Mengobrol
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-16 bg-background">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Pertanyaan yang Sering Diajukan</h2>
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-6 faq-item">
+                    <button class="flex justify-between items-center w-full py-3 px-4 bg-card rounded-lg focus:outline-none" onclick="toggleFAQ(this)">
+                        <span class="font-semibold">Apakah CerdasBudi benar-benar dapat menggantikan psikolog manusia?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden mt-2 p-4 bg-gray-700 rounded-lg">
+                        <p>CerdasBudi tidak dimaksudkan untuk menggantikan psikolog manusia. Ia adalah alat pendukung yang dapat memberikan saran awal dan dukungan, tetapi untuk masalah kesehatan mental yang serius, selalu disarankan untuk berkonsultasi dengan profesional kesehatan mental yang berkualifikasi.</p>
+                    </div>
+                </div>
+                <div class="mb-6 faq-item">
+                    <button class="flex justify-between items-center w-full py-3 px-4 bg-card rounded-lg focus:outline-none" onclick="toggleFAQ(this)">
+                        <span class="font-semibold">Apakah percakapan saya dengan CerdasBudi bersifat pribadi?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden mt-2 p-4 bg-gray-700 rounded-lg">
+                        <p>Ya, privasi Anda adalah prioritas kami. Semua percakapan dengan CerdasBudi bersifat rahasia dan tidak disimpan secara permanen. Kami menggunakan enkripsi end-to-end untuk memastikan keamanan data Anda.</p>
+                    </div>
+                </div>
+                <div class="mb-6 faq-item">
+                    <button class="flex justify-between items-center w-full py-3 px-4 bg-card rounded-lg focus:outline-none" onclick="toggleFAQ(this)">
+                        <span class="font-semibold">Bagaimana cara kerja CerdasBudi?</span>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden mt-2 p-4 bg-gray-700 rounded-lg">
+                        <p>CerdasBudi menggunakan teknologi kecerdasan buatan canggih untuk memahami pesan Anda dan memberikan respons yang relevan. Ia dilatih dengan pengetahuan psikologi dan teknik konseling untuk memberikan dukungan yang bermanfaat dalam mengatasi perundungan, rasa malu, dan meningkatkan kepercayaan diri.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Error Help Section -->
+    <section id="error-help" class="py-16 bg-card">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Bantuan Jika Terjadi Error</h2>
+            <div class="max-w-3xl mx-auto bg-background p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-4">Jika Anda Mengalami Masalah:</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Pastikan koneksi internet Anda stabil</li>
+                    <li>Coba muat ulang halaman website</li>
+                    <li>Bersihkan cache browser Anda</li>
+                    <li>Pastikan Anda menggunakan browser yang didukung (Chrome, Firefox, Safari versi terbaru)</li>
+                </ul>
+                <div class="mt-6">
+                    <a href="https://wa.link/higxks" target="_blank" class="bg-accent text-text font-bold py-2 px-4 rounded-md hover:bg-opacity-80 transition duration-300 inline-flex items-center">
+                        <i class="fab fa-whatsapp mr-2"></i>Laporkan Error via WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-background py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 CerdasBudi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let apiKey = '';
+        let userName = '';
+        let userAge = '';
+        let userGender = '';
+
+        // Loading animation
+        window.addEventListener('load', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            gsap.to(loadingScreen, {duration: 1, opacity: 0, display: 'none', ease: 'power2.inOut'});
+            
+            // Animate main elements
+            gsap.to('#main-title', {duration: 1, opacity: 1, y: 20, delay: 0.5});
+            gsap.to('#main-subtitle', {duration: 1, opacity: 1, y: 20, delay: 0.7});
+            gsap.to('#start-chat-btn', {duration: 1, opacity: 1, y: 20, delay: 0.9});
+            gsap.to('#hero-image', {duration: 1, opacity: 1, scale: 1.05, delay: 1.1});
+
+            // Animate feature cards
+            gsap.to('.feature-card', {duration: 1, opacity: 1, y: 20, stagger: 0.2, delay: 1.3});
+        });
+
+        // Navbar transparency
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // FAQ toggle function
+        function toggleFAQ(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            
+            gsap.to(content, {
+                duration: 0.3,
+                height: content.style.height === 'auto' ? 0 : 'auto',
+                opacity: content.style.height === 'auto' ? 0 : 1,
+                onComplete: () => {
+                    content.classList.toggle('hidden');
+                }
+            });
+
+            gsap.to(icon, {
+                duration: 0.3,
+                rotation: icon.style.transform === 'rotate(180deg)' ? 0 : 180
+            });
+        }
+
+        // API Key handling
+        async function loadApiKey() {
+            try {
+                const response = await fetch('.env');
+                if (!response.ok) {
+                    throw new Error('Gagal memuat file .env');
+                }
+                const text = await response.text();
+                const match = text.match(/API_KEY=(.+)/);
+                if (match && match[1]) {
+                    apiKey = match[1].trim();
+                } else {
+                    throw new Error('API key tidak ditemukan di file .env');
+                }
+            } catch (error) {
+                console.error('Error memuat API key:', error);
+                await promptForApiKey();
+            }
+        }
+
+        async function promptForApiKey() {
+            const result = await Swal.fire({
+                icon: 'info',
+                title: 'API Key Diperlukan',
+                html: 'Silakan masukkan API key Anda:<br><br>' +
+                      '<a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-blue-500 hover:underline">Klik di sini untuk mendapatkan API key</a>',
+                input: 'text',
+                inputPlaceholder: 'API key Anda',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Anda perlu memasukkan API key!';
+                    }
+                }
+            });
+
+            if (result.isConfirmed) {
+                apiKey = result.value;
+                await saveApiKey(apiKey);
+            }
+        }
+
+        async function saveApiKey(key) {
+            try {
+                const response = await fetch('/save-api-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ apiKey: key }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Gagal menyimpan API key');
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'API Key Tersimpan',
+                    text: 'API key Anda telah berhasil disimpan.',
+                });
+            } catch (error) {
+                console.error('Error menyimpan API key:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal menyimpan API key. Silakan coba lagi nanti.',
+                });
+            }
+        }
+
+        loadApiKey();
+
+        // Handle user profile form submission
+        const userProfileForm = document.getElementById('user-profile-form');
+        userProfileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            userName = document.getElementById('user-name').value;
+            userAge = document.getElementById('user-age').value;
+            userGender = document.querySelector('input[name="user-gender"]:checked').value;
+            
+            // Redirect to chat interface page
+            window.location.href = `chat4.html?name=${encodeURIComponent(userName)}&age=${encodeURIComponent(userAge)}&gender=${encodeURIComponent(userGender)}`;
+        });
+    </script>
+</body>
+</html>
