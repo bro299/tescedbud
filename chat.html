@@ -70,18 +70,23 @@
     </style>
 </head>
 <body class="bg-background text-text font-sans dark">
-    <div class="flex flex-col h-screen">
-
-        <!-- Sidebar
+    <div class="flex flex-col h-screen lg:flex-row">
+        <!-- Sidebar -->
         <div class="w-full lg:w-64 bg-card p-4 lg:p-6 flex flex-col">
             <div class="flex items-center mb-6">
                 <i class="fas fa-brain text-accent text-2xl mr-3"></i>
                 <h1 class="text-2xl font-bold">CerdasBudi</h1>
             </div>
+            <div class="flex-grow overflow-y-auto mb-4">
+                <h2 class="text-lg font-semibold mb-4">Riwayat Chat</h2>
+                <ul id="chat-history" class="space-y-2">
+                    <!-- Chat history items will be added here dynamically -->
+                </ul>
+            </div>
             <button id="new-chat-btn" class="w-full bg-accent text-white py-2 px-4 rounded-full hover:bg-opacity-80 transition duration-300">
                 <i class="fas fa-plus mr-2"></i>Chat Baru
             </button>
-        </div> -->
+        </div>
 
         <!-- Main Chat Area -->
         <div class="flex-grow flex flex-col">
@@ -142,7 +147,7 @@
                 icon: 'info',
                 title: 'API Key Diperlukan',
                 html: 'Silakan masukkan API key Anda:<br><br>' +
-                      '<a href="https://aistudio.google.com/app/apikey?" target="_blank" class="text-blue-500 hover:underline">Klik di sini untuk mendapatkan API key</a>',
+                      '<a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-blue-500 hover:underline">Klik di sini untuk mendapatkan API key</a>',
                 input: 'text',
                 inputPlaceholder: 'API key Anda',
                 showCancelButton: true,
